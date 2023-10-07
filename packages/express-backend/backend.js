@@ -3,6 +3,16 @@ import express from "express";
 const app = express();
 const port = 8000;
 
+// boilerplate express app
+app.use(express.json());
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
+app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`);
+});
+
+// return list of users
 const users = { 
     users_list : [
        { 
@@ -32,41 +42,32 @@ const users = {
        }
     ]
  }
- const findUserByName = (name) => { 
+ 
+//get by name & job: ex - http://localhost:8000/users?name=Mac?job=Bouncer
+const findUserByNameByJob = (name, job) => { 
     return users['users_list']
-        .filter( (user) => user['name'] === name); 
+        .filter( (user) => user['name'] === name)
+        .filter( (user) => user['job'] === job);
 }
-
-const findUserById = (id) =>
-    users['users_list']
-        .find( (user) => user['id'] === id);
-
-        app.use(express.json());
-
-        app.get('/', (req, res) => {
-            res.send('Hello World!');
-        });
-        
-        app.listen(port, () => {
-            console.log(`Example app listening at http://localhost:${port}`);
-        });
-        
-        
-        app.get('/users', (req, res) => {
-            res.send(users);
-        });
-        
-//ex: http://localhost:8000/users/zap555
-app.get('/users/:id', (req, res) => {
-    const id = req.params['id']; //or req.params.id
-    let result = findUserById(id);
-    if (result === undefined) {
-        res.status(404).send('Resource not found.');
-    } else {
+app.get('/users', (req, res) => {
+    const name = req.query.name;
+    const job = req.query.job;
+    console.log(`name: ${name}, job:  ${job}`)
+    if (name != undefined && job != undefined){
+        let result = findUserByNameByJob(name, job);
+        result = {users_list: result};
         res.send(result);
+    }
+    else{
+        res.send(users);
     }
 });
 
+//get by name: ex - http://localhost:8000/users?name=Mac
+const findUserByName = (name) => { 
+    return users['users_list']
+        .filter( (user) => user['name'] === name); 
+}
 app.get('/users', (req, res) => {
     const name = req.query.name;
     if (name != undefined){
@@ -79,4 +80,52 @@ app.get('/users', (req, res) => {
     }
 });
 
+//get by id: ex - http://localhost:8000/users/zap555
+const findUserById = (id) =>
+    users['users_list']
+        .find( (user) => user['id'] === id);
+app.get('/users/:id', (req, res) => {
+    const id = req.params['id']; //or req.params.id
+    let result = findUserById(id); 
+    if (result === undefined) {
+        res.status(404).send('Resource not found.');
+    } else {
+        res.send(result);
+    }
+});
 
+// using POST (boomerang extension)
+const addUser = (user) => {
+    users['users_list'].push(user);
+    return user;
+}
+app.post('/users', (req, res) => {
+    const userToAdd = req.body;
+    addUser(userToAdd);
+    res.send();
+});
+
+// using DELETE (ex - http://localhost:8000/users/zap555 with boomerang extension)
+const deleteUserById = (id) => { 
+    let index = users['users_list']
+        .indexOf(users['users_list']
+        .find((user) => user['id']  === id));
+    if (index !== -1) {
+        return users['users_list'].splice(index, 1);
+    }
+    return null;
+}
+app.delete('/users/:id', (req, res) => {
+    const id = req.params['id'];
+    let result = deleteUserById(id);
+    if (result === undefined) {
+        res.status(404).send('Resource not found.');
+    } else {
+        res.send(result);
+    }
+});
+
+
+app.get('/users', (req, res) => {
+    res.send(users);
+});
