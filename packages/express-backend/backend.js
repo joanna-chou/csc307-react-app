@@ -1,9 +1,11 @@
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
 
 // boilerplate express app
+app.use(cors()); //enable CORS requests
 app.use(express.json());
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -42,7 +44,7 @@ const users = {
        }
     ]
  }
- 
+
 //get by name & job: ex - http://localhost:8000/users?name=Mac?job=Bouncer
 const findUserByNameByJob = (name, job) => { 
     return users['users_list']
@@ -129,3 +131,4 @@ app.delete('/users/:id', (req, res) => {
 app.get('/users', (req, res) => {
     res.send(users);
 });
+
