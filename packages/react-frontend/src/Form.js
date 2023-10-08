@@ -2,25 +2,26 @@ import React, {useState} from 'react';
 
 function Form(props) {
     function handleChange(event) {
-        const { name, value } = event.target;
+        const { name, value} = event.target;
         if (name === "job")
           setPerson(
-             {name: person['name'], job: value}
+             {name: person['name'], job: value, id: person['id']}
           );
         else     
            setPerson(
-             {name: value, job: person['job']}   
+             {name: value, job: person['job'], id: person['id']}   
            );
       }
     function submitForm() {
         props.handleSubmit(person);
-        setPerson({name: '', job: ''});
+        setPerson({name: '', job: '', id: ''});
     }
       
   const [person, setPerson] = useState(
      {
         name: "",
         job: "",
+        id: ""
      }
   );
   return (

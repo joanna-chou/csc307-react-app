@@ -54,7 +54,6 @@ const findUserByNameByJob = (name, job) => {
 app.get('/users', (req, res) => {
     const name = req.query.name;
     const job = req.query.job;
-    console.log(`name: ${name}, job:  ${job}`)
     if (name != undefined && job != undefined){
         let result = findUserByNameByJob(name, job);
         result = {users_list: result};
@@ -98,13 +97,25 @@ app.get('/users/:id', (req, res) => {
 
 // using POST (boomerang extension)
 const addUser = (user) => {
+    const idBank = 'abcdefghijklmnopqrstuvwxyz0123456789'
+    // generating random six digit mix of integers and letters for id - source: https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+    user['id'] = '';
+    let counter = 0;
+    while (counter < 6) {
+        user['id'] += idBank.charAt(Math.floor(Math.random() * idBank.length));
+        counter += 1;
+    }
     users['users_list'].push(user);
     return user;
 }
 app.post('/users', (req, res) => {
     const userToAdd = req.body;
-    addUser(userToAdd);
-    res.send();
+    let result = addUser(userToAdd);
+    if (result === undefined) {
+        res.status(404).send('Resource not found.');
+    } else {
+        res.status(201).send(result);
+    }
 });
 
 // using DELETE (ex - http://localhost:8000/users/zap555 with boomerang extension)
@@ -113,7 +124,8 @@ const deleteUserById = (id) => {
         .indexOf(users['users_list']
         .find((user) => user['id']  === id));
     if (index !== -1) {
-        return users['users_list'].splice(index, 1);
+        users['users_list'].splice(index, 1);
+        return users['users_list'];
     }
     return null;
 }
@@ -123,10 +135,9 @@ app.delete('/users/:id', (req, res) => {
     if (result === undefined) {
         res.status(404).send('Resource not found.');
     } else {
-        res.send(result);
+        res.status(204).send(result);
     }
 });
-
 
 app.get('/users', (req, res) => {
     res.send(users);
