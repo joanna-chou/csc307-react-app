@@ -105,7 +105,9 @@ const addUser = (user) => {
         user['id'] += idBank.charAt(Math.floor(Math.random() * idBank.length));
         counter += 1;
     }
+    console.log(users['users_list'])
     users['users_list'].push(user);
+    console.log(users['users_list'])
     return user;
 }
 app.post('/users', (req, res) => {
@@ -135,8 +137,8 @@ app.delete('/users/:id', (req, res) => {
     if (result === undefined) {
         res.status(404).send('Resource not found.');
     } else {
-        console.log(res)
-        res.status(204).json({message: "Successfully Registered", status: 204}).send(result)
+        console.log(result)
+        res.status(204).send(result);
     }
 });
 
