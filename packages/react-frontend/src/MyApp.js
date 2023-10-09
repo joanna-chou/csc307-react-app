@@ -8,11 +8,12 @@ function MyApp() {
     const [characters, setCharacters] = useState([]);
       function removeOneCharacter (index) {
         deleteUser(characters[index].id)
-          .then((res) => res.status === 201 ? res.json() : undefined)
-          .then((json) => {const updated = characters.filter((character, i) => {
+          .then((res) => {
+            if (res.status === 204)
+             {const updated = characters.filter((character, i) => {
             return i !== index
           });
-          setCharacters(updated)}) 
+          setCharacters(updated)}}) 
           .catch((error) => {
             console.log(error);
           })
@@ -20,7 +21,7 @@ function MyApp() {
     function updateList(person) {
         postUser(person)
           .then((res) => {
-            return res.status === 201 ? res.json() : undefined})
+            return res.status === 201 ? res.json() : undefined}) // return newly created POST object
           .then((json) => {
             if (json) setCharacters([...characters, json])})
           .catch((error) => {
