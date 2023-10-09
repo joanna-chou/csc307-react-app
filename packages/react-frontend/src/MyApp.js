@@ -5,28 +5,38 @@ import Form from "./Form"
 
 
 function MyApp() {
-    const [characters, setCharacters] = useState([]);
-      function removeOneCharacter (index) {
-        deleteUser(characters[index].id)
-          .then((res) => res.status === 201 ? res.json() : undefined)
-          .then((json) => {const updated = characters.filter((character, i) => {
+  const [characters, setCharacters] = useState([]);
+  
+  function removeOneCharacter (index) {
+    deleteUser(characters[index].id)
+      .then((res) => {
+        if (res.status === 204){
+          const updated = characters.filter((character, i) => {
             return i !== index
           });
-          setCharacters(updated)}) 
-          .catch((error) => {
-            console.log(error);
-          })
-      }
-    function updateList(person) {
-        postUser(person)
-          .then((res) => {
-            return res.status === 201 ? res.json() : undefined})
-          .then((json) => {
-            if (json) setCharacters([...characters, json])})
-          .catch((error) => {
-            console.log(error);
-          });
-      }
+        setCharacters(updated)}}) 
+      .catch((error) => {
+        console.log(error);
+      })
+  }
+
+function updateList(person) {
+    postUser(person)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((res) => {
+        if (res.status === 201){
+            setCharacters([...characters, person])
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
 useEffect(() => {
   fetchUsers()
